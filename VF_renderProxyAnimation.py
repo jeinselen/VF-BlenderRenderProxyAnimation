@@ -1,7 +1,7 @@
 bl_info = {
 	"name": "VF Render Proxy Animation", # VF Render Proxy Animation is probably better
 	"author": "John Einselen - Vectorform LLC, based on work by tstscr(florianfelix)",
-	"version": (0, 2),
+	"version": (0, 3),
 	"blender": (2, 80, 0),
 	"location": "Render > Render Proxy Animation",
 	"description": "Temporarily overrides render settings with custom proxy preferences and renders a sequence",
@@ -25,19 +25,16 @@ class VF_proxyStart(bpy.types.Operator):
 
 	def execute(self, context):
 	# Save original render engine settings
-		bpy.context.scene.proxy_render_settings.original_renderEngine = bpy.data.scenes["Scene"].render.engine
-		bpy.context.scene.proxy_render_settings.original_renderSamples = bpy.data.scenes["Scene"].eevee.taa_render_samples
+		original_renderEngine = bpy.data.scenes["Scene"].render.engine
+		original_renderSamples = bpy.data.scenes["Scene"].eevee.taa_render_samples
 	# Save original file format settings
-		bpy.context.scene.proxy_render_settings.original_format = bpy.data.scenes["Scene"].render.image_settings.file_format
-		bpy.context.scene.proxy_render_settings.original_colormode = bpy.data.scenes["Scene"].render.image_settings.color_mode
-		bpy.context.scene.proxy_render_settings.original_colordepth = bpy.data.scenes["Scene"].render.image_settings.color_depth
+		original_format = bpy.data.scenes["Scene"].render.image_settings.file_format
+		original_colormode = bpy.data.scenes["Scene"].render.image_settings.color_mode
+		original_colordepth = bpy.data.scenes["Scene"].render.image_settings.color_depth
 	# Save original resolution multiplier settings
-		bpy.context.scene.proxy_render_settings.original_resolutionMultiplier = bpy.data.scenes["Scene"].render.resolution_percentage
+		original_resolutionMultiplier = bpy.data.scenes["Scene"].render.resolution_percentage
 	# Save original nodal compositing settings
-		bpy.context.scene.proxy_render_settings.original_compositing = bpy.data.scenes["Scene"].use_nodes
-
-	# Set proxy start variable
-		bpy.context.scene.proxy_render_settings.proxy_started = True
+		original_compositing = bpy.data.scenes["Scene"].use_nodes
 
 	# Override render engine settings
 		bpy.data.scenes["Scene"].render.engine = str(bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_renderEngine)
@@ -63,19 +60,16 @@ class VF_proxyStart(bpy.types.Operator):
 		print("VF_proxyEnd-2")
 
 	# Restore original render engine settings
-		bpy.data.scenes["Scene"].render.engine = bpy.context.scene.proxy_render_settings.original_renderEngine
-		bpy.data.scenes["Scene"].eevee.taa_render_samples = bpy.context.scene.proxy_render_settings.original_renderSamples
+		bpy.data.scenes["Scene"].render.engine = original_renderEngine
+		bpy.data.scenes["Scene"].eevee.taa_render_samples = original_renderSamples
 	# Restore original file format settings
-		bpy.data.scenes["Scene"].render.image_settings.file_format = bpy.context.scene.proxy_render_settings.original_format
-		bpy.data.scenes["Scene"].render.image_settings.color_mode = bpy.context.scene.proxy_render_settings.original_colormode
-		bpy.data.scenes["Scene"].render.image_settings.color_depth = bpy.context.scene.proxy_render_settings.original_colordepth
+		bpy.data.scenes["Scene"].render.image_settings.file_format = original_format
+		bpy.data.scenes["Scene"].render.image_settings.color_mode = original_colormode
+		bpy.data.scenes["Scene"].render.image_settings.color_depth = original_colordepth
 	# Restore original resolution multiplier settings
-		bpy.data.scenes["Scene"].render.resolution_percentage = bpy.context.scene.proxy_render_settings.original_resolutionMultiplier
+		bpy.data.scenes["Scene"].render.resolution_percentage = original_resolutionMultiplier
 	# Restore original nodal compositing settings
-		bpy.data.scenes["Scene"].use_nodes = bpy.context.scene.proxy_render_settings.original_compositing
-
-	# Set proxy start variable to false, we're done now and everything should be restored correctly
-		bpy.context.scene.proxy_render_settings.proxy_started = False
+		bpy.data.scenes["Scene"].use_nodes = original_compositing
 
 		return {'FINISHED'}
 
@@ -138,51 +132,7 @@ class ProxyRenderPreferences(bpy.types.AddonPreferences):
 		grid.prop(self, "proxy_resolutionMultiplier")
 
 ###########################################################################
-# Project settings and UI rendering classes
-
-class ProxyRenderSettings(bpy.types.PropertyGroup):
-	# Hidden per-project values
-	# Proxy start: this is important to prevent resetting of settings that weren't updated by starting a proxy render!
-	proxy_started: bpy.props.BoolProperty(
-		name="Proxy Started",
-		description="Indicates if proxy rendering was started (disables render setting restoration when false)",
-		default=False)
-
-	# Render engine settings
-	original_renderEngine: bpy.props.StringProperty(
-		name="Original Render Engine",
-		description="Stores the scene setting so it can be restored after proxy rendering is completed or cancelled",
-		default="")
-	original_renderSamples: bpy.props.IntProperty(
-		name="Original Render Engine Samples",
-		description="Stores the scene setting so it can be restored after proxy rendering is completed or cancelled",
-		default=8)
-
-	# File format settings
-	original_format: bpy.props.StringProperty(
-		name="Original Output Format",
-		description="Stores the scene setting so it can be restored after proxy rendering is completed or cancelled",
-		default="")
-	original_colormode: bpy.props.StringProperty(
-		name="Original Color Mode",
-		description="Stores the scene setting so it can be restored after proxy rendering is completed or cancelled",
-		default="")
-	original_colordepth: bpy.props.StringProperty(
-		name="Original Color Depth",
-		description="Stores the scene setting so it can be restored after proxy rendering is completed or cancelled",
-		default="")
-
-	# Resolution settings
-	original_resolutionMultiplier: bpy.props.IntProperty(
-		name="Original Resolution Multiplier",
-		description="Stores the scene setting so it can be restored after proxy rendering is completed or cancelled",
-		default=100)
-
-	# Compositing settings
-	original_compositing: bpy.props.BoolProperty(
-		name="Original Color Depth",
-		description="Stores the scene setting so it can be restored after proxy rendering is completed or cancelled",
-		default=True)
+# UI rendering classes
 
 def vf_prepend_menu_renderProxyAnimation(self,context):
 	try:
@@ -191,7 +141,7 @@ def vf_prepend_menu_renderProxyAnimation(self,context):
 	except Exception as exc:
 		print(str(exc) + " | Error in Topbar Mt Render when adding to menu")
 
-classes = (ProxyRenderPreferences, ProxyRenderSettings, VF_proxyStart)
+classes = (ProxyRenderPreferences, VF_proxyStart)
 
 ###########################################################################
 # Addon registration functions
@@ -201,7 +151,6 @@ def register():
 	# register classes
 	for cls in classes:
 		bpy.utils.register_class(cls)
-	bpy.types.Scene.proxy_render_settings = bpy.props.PointerProperty(type=ProxyRenderSettings)
 	bpy.types.TOPBAR_MT_render.prepend(vf_prepend_menu_renderProxyAnimation)
 	# handle the keymap
 	wm = bpy.context.window_manager
@@ -219,7 +168,6 @@ def unregister():
 	# unregister classes
 	for cls in reversed(classes):
 		bpy.utils.unregister_class(cls)
-	del bpy.types.Scene.proxy_render_settings
 	bpy.types.TOPBAR_MT_render.remove(vf_prepend_menu_renderProxyAnimation)
 
 if __name__ == "__main__":

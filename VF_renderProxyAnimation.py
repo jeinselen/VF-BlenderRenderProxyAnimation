@@ -1,7 +1,7 @@
 bl_info = {
 	"name": "VF Render Proxy Animation", # VF Render Proxy Animation is probably better
 	"author": "John Einselen - Vectorform LLC, based on work by tstscr(florianfelix)",
-	"version": (0, 1),
+	"version": (0, 2),
 	"blender": (2, 80, 0),
 	"location": "Render > Render Proxy Animation",
 	"description": "Temporarily overrides render settings with custom proxy preferences and renders a sequence",
@@ -79,32 +79,6 @@ class VF_proxyStart(bpy.types.Operator):
 
 		return {'FINISHED'}
 
-class VF_proxyEnd(bpy.types.Operator):
-	bl_idname = "vfproxyend.offset"
-	bl_label = "Proxy Animation Finished"
-	bl_description = "Restore original render quality settings"
-
-	def execute(self, context):
-		print("VF_proxyEnd-1")
-		if bpy.context.scene.proxy_render_settings.proxy_started:
-		# Restore original render engine settings
-			bpy.data.scenes["Scene"].render.engine = bpy.context.scene.proxy_render_settings.original_renderEngine
-			bpy.data.scenes["Scene"].eevee.taa_render_samples = bpy.context.scene.proxy_render_settings.original_renderSamples
-		# Restore original file format settings
-			bpy.data.scenes["Scene"].render.image_settings.file_format = bpy.context.scene.proxy_render_settings.original_format
-			bpy.data.scenes["Scene"].render.image_settings.color_mode = bpy.context.scene.proxy_render_settings.original_colormode
-			bpy.data.scenes["Scene"].render.image_settings.color_depth = bpy.context.scene.proxy_render_settings.original_colordepth
-		# Restore original resolution multiplier settings
-			bpy.data.scenes["Scene"].render.resolution_percentage = bpy.context.scene.proxy_render_settings.original_resolutionMultiplier
-		# Restore original nodal compositing settings
-			bpy.data.scenes["Scene"].use_nodes = bpy.context.scene.proxy_render_settings.original_compositing
-
-		# Set proxy start variable to false, we're done now and everything should be restored correctly
-			bpy.context.scene.proxy_render_settings.proxy_started = False
-
-		print("VF_proxyEnd-2")
-		return {'FINISHED'}
-
 ###########################################################################
 # User preferences and UI rendering class
 
@@ -157,12 +131,11 @@ class ProxyRenderPreferences(bpy.types.AddonPreferences):
 
 		grid = layout.grid_flow(row_major=True)
 		grid.prop(self, "proxy_renderEngine")
-		if bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_renderEngine == "EEVEE":
+		if bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_renderEngine == "BLENDER_EEVEE":
 			grid.prop(self, "proxy_renderSamples")
 		grid.prop(self, "proxy_format")
 		grid.prop(self, "proxy_compositing")
 		grid.prop(self, "proxy_resolutionMultiplier")
-
 
 ###########################################################################
 # Project settings and UI rendering classes
@@ -218,7 +191,7 @@ def vf_prepend_menu_renderProxyAnimation(self,context):
 	except Exception as exc:
 		print(str(exc) + " | Error in Topbar Mt Render when adding to menu")
 
-classes = (ProxyRenderPreferences, ProxyRenderSettings, VF_proxyStart)# , VF_proxyEnd)
+classes = (ProxyRenderPreferences, ProxyRenderSettings, VF_proxyStart)
 
 ###########################################################################
 # Addon registration functions
@@ -230,8 +203,6 @@ def register():
 		bpy.utils.register_class(cls)
 	bpy.types.Scene.proxy_render_settings = bpy.props.PointerProperty(type=ProxyRenderSettings)
 	bpy.types.TOPBAR_MT_render.prepend(vf_prepend_menu_renderProxyAnimation)
-	bpy.app.handlers.render_cancel.append(VF_proxyEnd)
-	bpy.app.handlers.render_complete.append(VF_proxyEnd)
 	# handle the keymap
 	wm = bpy.context.window_manager
 	kc = wm.keyconfigs.addon
@@ -250,8 +221,6 @@ def unregister():
 		bpy.utils.unregister_class(cls)
 	del bpy.types.Scene.proxy_render_settings
 	bpy.types.TOPBAR_MT_render.remove(vf_prepend_menu_renderProxyAnimation)
-	bpy.app.handlers.render_cancel.remove(VF_proxyEnd)
-	bpy.app.handlers.render_complete.remove(VF_proxyEnd)
 
 if __name__ == "__main__":
 	register()

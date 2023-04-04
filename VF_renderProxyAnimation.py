@@ -1,7 +1,7 @@
 bl_info = {
 	"name": "VF Render Proxy Animation", # VF Render Proxy Animation is probably better
 	"author": "John Einselen - Vectorform LLC, based on work by tstscr(florianfelix)",
-	"version": (0, 3),
+	"version": (0, 4),
 	"blender": (2, 80, 0),
 	"location": "Render > Render Proxy Animation",
 	"description": "Temporarily overrides render settings with custom proxy preferences and renders a sequence",
@@ -25,34 +25,34 @@ class VF_proxyStart(bpy.types.Operator):
 
 	def execute(self, context):
 	# Save original render engine settings
-		original_renderEngine = bpy.data.scenes["Scene"].render.engine
-		original_renderSamples = bpy.data.scenes["Scene"].eevee.taa_render_samples
+		original_renderEngine = bpy.context.scene.render.engine
+		original_renderSamples = bpy.context.scene.eevee.taa_render_samples
 	# Save original file format settings
-		original_format = bpy.data.scenes["Scene"].render.image_settings.file_format
-		original_colormode = bpy.data.scenes["Scene"].render.image_settings.color_mode
-		original_colordepth = bpy.data.scenes["Scene"].render.image_settings.color_depth
+		original_format = bpy.context.scene.render.image_settings.file_format
+		original_colormode = bpy.context.scene.render.image_settings.color_mode
+		original_colordepth = bpy.context.scene.render.image_settings.color_depth
 	# Save original resolution multiplier settings
-		original_resolutionMultiplier = bpy.data.scenes["Scene"].render.resolution_percentage
+		original_resolutionMultiplier = bpy.context.scene.render.resolution_percentage
 	# Save original nodal compositing settings
-		original_compositing = bpy.data.scenes["Scene"].use_nodes
+		original_compositing = bpy.context.scene.use_nodes
 
 	# Override render engine settings
-		bpy.data.scenes["Scene"].render.engine = str(bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_renderEngine)
-		bpy.data.scenes["Scene"].eevee.taa_render_samples = bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_renderSamples
+		bpy.context.scene.render.engine = str(bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_renderEngine)
+		bpy.context.scene.eevee.taa_render_samples = bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_renderSamples
 	# Override original file format settings
 		if bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_format == 'JPEG':
-			bpy.data.scenes["Scene"].render.image_settings.file_format = 'JPEG'
+			bpy.context.scene.render.image_settings.file_format = 'JPEG'
 		elif bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_format == 'PNG':
-			bpy.data.scenes["Scene"].render.image_settings.file_format = 'PNG'
+			bpy.context.scene.render.image_settings.file_format = 'PNG'
 		elif bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_format == 'OPEN_EXR_MULTILAYER':
-			bpy.data.scenes["Scene"].render.image_settings.file_format = 'OPEN_EXR_MULTILAYER'
+			bpy.context.scene.render.image_settings.file_format = 'OPEN_EXR_MULTILAYER'
 	# Override original resolution multiplier settings
-		bpy.data.scenes["Scene"].render.resolution_percentage = bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_resolutionMultiplier
+		bpy.context.scene.render.resolution_percentage = bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_resolutionMultiplier
 	# Override original nodal compositing settings
 		if bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_compositing == "ON":
-			bpy.data.scenes["Scene"].use_nodes = True
+			bpy.context.scene.use_nodes = True
 		elif bpy.context.preferences.addons['VF_renderProxyAnimation'].preferences.proxy_compositing == "OFF":
-			bpy.data.scenes["Scene"].use_nodes = False
+			bpy.context.scene.use_nodes = False
 
 	# Now render!
 		print("VF_proxyEnd-1")
@@ -60,16 +60,16 @@ class VF_proxyStart(bpy.types.Operator):
 		print("VF_proxyEnd-2")
 
 	# Restore original render engine settings
-		bpy.data.scenes["Scene"].render.engine = original_renderEngine
-		bpy.data.scenes["Scene"].eevee.taa_render_samples = original_renderSamples
+		bpy.context.scene.render.engine = original_renderEngine
+		bpy.context.scene.eevee.taa_render_samples = original_renderSamples
 	# Restore original file format settings
-		bpy.data.scenes["Scene"].render.image_settings.file_format = original_format
-		bpy.data.scenes["Scene"].render.image_settings.color_mode = original_colormode
-		bpy.data.scenes["Scene"].render.image_settings.color_depth = original_colordepth
+		bpy.context.scene.render.image_settings.file_format = original_format
+		bpy.context.scene.render.image_settings.color_mode = original_colormode
+		bpy.context.scene.render.image_settings.color_depth = original_colordepth
 	# Restore original resolution multiplier settings
-		bpy.data.scenes["Scene"].render.resolution_percentage = original_resolutionMultiplier
+		bpy.context.scene.render.resolution_percentage = original_resolutionMultiplier
 	# Restore original nodal compositing settings
-		bpy.data.scenes["Scene"].use_nodes = original_compositing
+		bpy.context.scene.use_nodes = original_compositing
 
 		return {'FINISHED'}
 

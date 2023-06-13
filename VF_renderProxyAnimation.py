@@ -1,7 +1,7 @@
 bl_info = {
 	"name": "VF Render Proxy Animation", # VF Render Proxy Animation is probably better
 	"author": "John Einselen - Vectorform LLC, based on work by tstscr(florianfelix)",
-	"version": (0, 4),
+	"version": (0, 5),
 	"blender": (2, 80, 0),
 	"location": "Render > Render Proxy Animation",
 	"description": "Temporarily overrides render settings with custom proxy preferences and renders a sequence",
@@ -19,7 +19,7 @@ from bpy.app.handlers import persistent
 # Render Proxy Animation primary functionality classes
 
 class VF_proxyStart(bpy.types.Operator):
-	bl_idname = "vfproxystart.offset"
+	bl_idname = "render.vf_render_proxy_animation"
 	bl_label = "Render Proxy Animation"
 	bl_description = "Temporarily reduce render quality for quickly creating animation proxies"
 
@@ -55,9 +55,7 @@ class VF_proxyStart(bpy.types.Operator):
 			bpy.context.scene.use_nodes = False
 
 	# Now render!
-		print("VF_proxyEnd-1")
 		bpy.ops.render.render(animation=True, use_viewport=True)
-		print("VF_proxyEnd-2")
 
 	# Restore original render engine settings
 		bpy.context.scene.render.engine = original_renderEngine
@@ -157,6 +155,10 @@ def register():
 	kc = wm.keyconfigs.addon
 	if kc:
 		km = wm.keyconfigs.addon.keymaps.new(name='Screen Editing', space_type='EMPTY')
+		kmi = km.keymap_items.new(VF_proxyStart.bl_idname, 'RET', 'PRESS', ctrl=True, alt=True, shift=True)
+		addon_keymaps.append((km, kmi))
+	if kc:
+		km = wm.keyconfigs.addon.keymaps.new(name='Screen Editing', space_type='EMPTY')
 		kmi = km.keymap_items.new(VF_proxyStart.bl_idname, 'RET', 'PRESS', oskey=True, alt=True, shift=True)
 		addon_keymaps.append((km, kmi))
 
@@ -172,3 +174,4 @@ def unregister():
 
 if __name__ == "__main__":
 	register()
+	

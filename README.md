@@ -5,7 +5,7 @@ Adds a proxy render menu item to temporarily reduce output quality for super fas
 ![screenshot of Blender's Render menu with the add-on installed](images/menu.png)
 
 ## Installation and usage
-- Download the .py file
+- Download [VF_renderProxyAnimation.py](https://raw.githubusercontent.com/jeinselenVF/VF-BlenderRenderProxyAnimation/main/VF_renderProxyAnimation.py)
 - Open Blender preferences and navigate to the "Add-ons" tab
 - Install and turn on the Add-on
 - Customise the preferences as needed

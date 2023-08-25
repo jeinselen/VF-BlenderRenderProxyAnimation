@@ -2,12 +2,12 @@ bl_info = {
 	"name": "VF Render Proxy Animation", # VF Render Proxy Animation is probably better
 	"author": "John Einselen - Vectorform LLC, based on work by tstscr(florianfelix)",
 	"version": (0, 5),
-	"blender": (2, 80, 0),
+	"blender": (2, 83, 0),
 	"location": "Render > Render Proxy Animation",
 	"description": "Temporarily overrides render settings with custom proxy preferences and renders a sequence",
 	"warning": "inexperienced developer, use at your own risk",
-	"wiki_url": "",
-	"tracker_url": "",
+	"doc_url": "https://github.com/jeinselenVF/VF-BlenderRenderProxyAnimation",
+	"tracker_url": "https://github.com/jeinselenVF/VF-BlenderRenderProxyAnimation/issues",
 	"category": "Render"}
 
 # https://devtalk.blender.org/t/addon-shortcuts/2410/7
@@ -174,4 +174,3 @@ def unregister():
 
 if __name__ == "__main__":
 	register()
-	

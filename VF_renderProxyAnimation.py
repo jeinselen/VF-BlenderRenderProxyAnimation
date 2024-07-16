@@ -1,5 +1,5 @@
 bl_info = {
-	"name": "VF Render Proxy Animation", # VF Render Proxy Animation is probably better
+	"name": "VF Render Proxy Animation",
 	"author": "John Einselen - Vectorform LLC, based on work by tstscr(florianfelix)",
 	"version": (0, 5),
 	"blender": (2, 83, 0),

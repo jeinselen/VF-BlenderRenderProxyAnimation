@@ -1,5 +1,7 @@
 # VF Render Proxy Animation
 
+This add-on was designed for Blender version 2.8-4.1 (though not all previous versions may be fully supported). For Blender 4.2 and onwards, [please see the new Render Kit extension](https://github.com/jeinselen/Blender-RenderKit).
+
 Adds a proxy render menu item to temporarily reduce output quality for super fast animation previews. This Blender add-on helps animators create motion previews without having to manually change the render engine, reduce the output quality, and toggle compositing nodes on and off. Keep rendering full-quality still images and animations while also outputting quick motion previews when needed.
 
 ![screenshot of Blender's Render menu with the add-on installed](images/menu.png)
